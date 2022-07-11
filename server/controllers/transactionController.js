@@ -1,9 +1,10 @@
 const asyncHandler = require('express-async-handler');
 const Transaction = require('../models/transactionModel');
+const User = require('../models/userModel');
 
 
 const getTransactions = asyncHandler(async (req, res) => {
-  const transactions = await Transaction.find();
+  const transactions = await Transaction.find({ user: req.user.id });
 
   res.status(200).json(transactions)
 });
@@ -13,11 +14,12 @@ const setTransaction = asyncHandler(async (req, res) => {
   const amount = req.body.amount;
   const category = req.body.category;
 
-  if(!name && !amount && !type) {
-    res.status(400).json({ meesage: "Please specify the empty fields" })
+  if(!name && !amount && !category) {
+    res.status(400).json({ message: "Please specify the empty fields" })
   }
 
   const transaction = await Transaction.create({
+    user: req.user.id,
     name: name,
     amount: amount,
     category: category
@@ -34,6 +36,18 @@ const updateTransaction = asyncHandler(async (req, res) => {
     throw new Error('Transaction not found');
   }
 
+  const user = await User.findById(req.user.id);
+
+  if(!user) {
+    res.status(401)
+    throw new Error("User not found");
+  }
+
+  if(transaction.user.toString() !== user.id) {
+    res.status(401);
+    throw new Error("User not authorized")
+  }
+
   const updatedTransaction = await Transaction.findByIdAndUpdate(req.params.id, req.body, { new: true });
 
   res.status(200).json(updatedTransaction);
@@ -45,6 +59,18 @@ const deleteTransaction = asyncHandler(async (req, res) => {
   if(!transaction) {
     res.status(404);
     throw new Error('Transaction not found');
+  }
+
+  const user = await User.findById(req.user.id);
+
+  if(!user) {
+    res.status(401)
+    throw new Error("User not found");
+  }
+
+  if(transaction.user.toString() !== user.id) {
+    res.status(401);
+    throw new Error("User not authorized")
   }
 
   await Transaction.deleteOne({

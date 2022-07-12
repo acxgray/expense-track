@@ -4,6 +4,8 @@ import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Register from "./pages/Register";
 import Header from "./components/Header";
+import {ToastContainer} from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
   return (
@@ -16,6 +18,7 @@ function App() {
           <Route path="/register" element={<Register />} />
         </Routes>
       </Router>
+      <ToastContainer />
     </>
   );
 }

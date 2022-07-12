@@ -1,7 +1,19 @@
 import { Container, Navbar } from 'react-bootstrap';
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import {useSelector, useDispatch} from "react-redux";
+import {logout, reset} from '../features/auth/authSlice';
 
 function Header() {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const {user} = useSelector((state) => state.auth)
+
+  const onLogout = () => {
+    dispatch(logout());
+    dispatch(reset());
+    navigate('/');
+  }
+
   return (
     <Navbar bg="light" expand="lg">
       <Container>
@@ -11,12 +23,22 @@ function Header() {
         </button>
         <div className="collapse navbar-collapse" id="navbarSupportedContent">
           <ul className="navbar-nav ms-auto mb-2 mb-lg-0">
-            <li className="nav-item">
-              <Link className="nav-link" to="/login">Login</Link>
-            </li>
-            <li className="nav-item">
-              <Link className="nav-link" to="/register">Register</Link>
-            </li>
+            {user ? (
+                <li className="nav-item">
+                  <button className="btn btn-link nav-link" onClick={onLogout}>Logout</button>
+                </li>
+              ) : (
+                <>
+                <li className="nav-item">
+                  <Link className="nav-link" to="/login">Login</Link>
+                </li>
+                <li className="nav-item">
+                  <Link className="nav-link" to="/register">Register</Link>
+                </li>
+                
+                </>
+              ) 
+            }
           </ul>
           {/* <form className="d-flex" role="search">
             <input className="form-control me-2" type="search" placeholder="Search" aria-label="Search" />

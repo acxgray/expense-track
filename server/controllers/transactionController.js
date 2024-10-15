@@ -13,7 +13,7 @@ const setTransaction = asyncHandler(async (req, res) => {
   const amount = req.body.amount;
   const category = req.body.category;
 
-  if(!name && !amount && !type) {
+  if(!name && !amount && !category) {
     res.status(400).json({ meesage: "Please specify the empty fields" })
   }
 
